@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Own Content Pipeline — @ayrus_ftw</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Anton&family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream:  #F5F0E8;
+    --navy:   #1A2340;
+    --amber:  #D97706;
+    --gray:   #6B6B6B;
+    --dark:   #1E1E1E;
+    --white:  #F1F1F0;
+    --light:  #EDE8DF;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 64px;
+    page-break-after: always;
+  }
+
+  .cover-top {
+    border-bottom: 2px solid rgba(255,255,255,0.15);
+    padding-bottom: 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .cover-main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 0; }
+
+  .cover-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 32px;
+  }
+
+  .cover-headline {
+    font-family: 'Anton', sans-serif;
+    font-size: 80px;
+    line-height: 1.0;
+    color: var(--white);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .cover-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 28px;
+    color: var(--amber);
+    margin-bottom: 40px;
+  }
+
+  .cover-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: rgba(255,255,255,0.55);
+    max-width: 560px;
+    line-height: 1.8;
+  }
+
+  .cover-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 32px;
+  }
+
+  .cover-handle {
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+  }
+
+  .cover-tools {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    text-align: right;
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 72px 48px;
+    page-break-after: always;
+  }
+
+  .page:last-child { page-break-after: auto; }
+
+  /* ── SECTION HEADERS ── */
+  .section-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    text-transform: uppercase;
+    color: var(--navy);
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+
+  .section-italic {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--amber);
+    margin-bottom: 32px;
+  }
+
+  .divider {
+    width: 100%;
+    height: 2px;
+    background: var(--navy);
+    margin: 32px 0;
+    opacity: 0.12;
+  }
+
+  .amber-divider {
+    width: 80px;
+    height: 3px;
+    background: var(--amber);
+    margin: 24px 0 32px;
+  }
+
+  /* ── BODY TEXT ── */
+  p {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.8;
+  }
+
+  /* ── STEPS ── */
+  .step {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 40px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    color: var(--amber);
+    line-height: 1;
+    min-width: 52px;
+    padding-top: 2px;
+  }
+
+  .step-content h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 22px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .step-content p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 10px;
+  }
+
+  /* ── CODE BLOCKS ── */
+  code {
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    background: #1E1E1E;
+    color: #D97706;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  pre {
+    background: #1E1E1E;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 16px 0 24px;
+    overflow-x: auto;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    color: #E8E8E6;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  pre code .comment { color: #6A737D; }
+  pre code .amber   { color: #D97706; }
+  pre code .green   { color: #85E89D; }
+  pre code .blue    { color: #79B8FF; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    background: var(--light);
+    border-left: 4px solid var(--amber);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 24px 0;
+  }
+
+  .callout strong {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--navy);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .callout p {
+    font-size: 14px;
+    color: #444;
+    margin: 0;
+  }
+
+  /* ── TOOL CARDS ── */
+  .tools-grid {
+    display: flex;
+    gap: 16px;
+    margin: 32px 0;
+  }
+
+  .tool-card {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 28px 24px;
+    color: var(--white);
+    flex: 1;
+  }
+
+  .tool-card .tool-num {
+    font-family: 'Anton', sans-serif;
+    font-size: 36px;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  .tool-card h4 {
+    font-family: 'Anton', sans-serif;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+
+  .tool-card p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+
+  th {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--navy);
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    color: #333;
+    line-height: 1.6;
+  }
+
+  td code { font-size: 12px; }
+
+  /* ── PAGE FOOTER ── */
+  .page-footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── PREVENT CROPPING ── */
+  .step         { page-break-inside: avoid; break-inside: avoid; }
+  .callout      { page-break-inside: avoid; break-inside: avoid; }
+  .tool-card    { page-break-inside: avoid; break-inside: avoid; }
+  tr            { page-break-inside: avoid; break-inside: avoid; }
+  pre           { page-break-inside: avoid; break-inside: avoid; overflow: visible; white-space: pre-wrap; word-break: break-all; }
+  h3, h4        { page-break-after: avoid; break-after: avoid; }
+  .section-title { page-break-after: avoid; break-after: avoid; }
+  p             { orphans: 3; widows: 3; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tool-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .callout { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     COVER
+══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">An Architect Learning AI &nbsp;·&nbsp; Free Resource</div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">Nine episodes of trial and error — distilled</div>
+    <div class="cover-headline">Build Your Own<br>Content Pipeline</div>
+    <div class="cover-sub">From idea to Instagram in three tools.</div>
+    <div class="cover-desc">
+      This guide covers everything you need to set up the exact pipeline used to build
+      <em>An Architect Learning AI</em> — cover images, carousel slides, and the AI assistant
+      that wrote all the scripts. No Python experience needed to start.
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-handle">@ayrus_ftw</div>
+    <div class="cover-tools">
+      ComfyUI Cloud &nbsp;·&nbsp; Python PIL &nbsp;·&nbsp; Claude Code
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 1 — OVERVIEW
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">Overview</div>
+  <div class="section-title">The Three</div>
+  <div class="section-italic">tools.</div>
+
+  <p>
+    Every piece of content in this series was produced by three tools working in sequence.
+    You don't need to be a developer to use them — you need to understand what each one does
+    and when it hands off to the next.
+  </p>
+
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-num">01</div>
+      <h4>ComfyUI Cloud</h4>
+      <p>Generates the illustrated scene. Character, environment, mood. No local install.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-num">02</div>
+      <h4>Python PIL</h4>
+      <p>Stamps the typography. Anton headline, Playfair emphasis, gray body. Pixel-precise.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-num">03</div>
+      <h4>Claude Code</h4>
+      <p>Writes the scripts. You describe what you want. It writes the Python. You run it.</p>
+    </div>
+  </div>
+
+  <div class="amber-divider"></div>
+
+  <p><strong>The flow:</strong></p>
+
+  <table>
+    <tr>
+      <th>Step</th>
+      <th>Tool</th>
+      <th>Input</th>
+      <th>Output</th>
+    </tr>
+    <tr>
+      <td>1. Generate scene</td>
+      <td>ComfyUI Cloud</td>
+      <td>Text prompt + reference image</td>
+      <td>Background PNG</td>
+    </tr>
+    <tr>
+      <td>2. Stamp text</td>
+      <td>Python PIL</td>
+      <td>Background PNG + script</td>
+      <td>Final slide PNG</td>
+    </tr>
+    <tr>
+      <td>3. Write script</td>
+      <td>Claude Code</td>
+      <td>Your description</td>
+      <td>Python script</td>
+    </tr>
+    <tr>
+      <td>4. Post</td>
+      <td>Instagram</td>
+      <td>Cover + slides</td>
+      <td>Carousel post</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <strong>Canvas size</strong>
+    <p>All slides are <strong>1856 × 2304 px</strong> — the 4:5 portrait format Instagram uses for carousels. Every script in this pipeline uses these dimensions.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 2 — SETUP: PYTHON
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">Setup — Part 1 of 3</div>
+  <div class="section-title">Python</div>
+  <div class="section-italic">the foundation.</div>
+
+  <p>Everything in this pipeline runs on Python 3.11. Not 3.10. Not 3.12. Version 3.11 specifically — this is the version ComfyUI Cloud and PIL play nicely with.</p>
+
+  <div class="amber-divider"></div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Check if Python 3.11 is installed</h3>
+      <p>Open Terminal and run:</p>
+      <pre><code>python3.11 --version</code></pre>
+      <p>If you see <code>Python 3.11.x</code> — skip to Step 3. If not, continue to Step 2.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Install Python 3.11 via Homebrew</h3>
+      <p>If you don't have Homebrew, install it first:</p>
+      <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+      <p>Then install Python 3.11:</p>
+      <pre><code>brew install python@3.11</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Install the required packages</h3>
+      <p>Navigate to your project folder and run:</p>
+      <pre><code>pip3.11 install -r requirements.txt</code></pre>
+      <p>This installs: <code>Pillow</code>, <code>requests</code>, <code>websockets</code>, <code>python-dotenv</code>.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Why 3.11 specifically?</strong>
+    <p>The ComfyUI Cloud WebSocket connection uses async features that behave differently across Python versions. 3.11 is the version this pipeline was built and tested on.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 3 — SETUP: COMFYUI CLOUD
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">Setup — Part 2 of 3</div>
+  <div class="section-title">ComfyUI</div>
+  <div class="section-italic">Cloud.</div>
+
+  <p>ComfyUI Cloud is the hosted version of ComfyUI — you generate images via API without installing anything locally. This pipeline uses the <strong>Nano Banana 2</strong> model (Gemini Flash Image).</p>
+
+  <div class="amber-divider"></div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Create an account</h3>
+      <p>Go to <code>cloud.comfy.org</code> and sign up. Free to create — you pay per generation.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Add credits</h3>
+      <p>Go to <strong>Settings → Billing</strong> and add a small amount. Nano Banana 2 at 2K resolution costs roughly $0.02–0.05 per image. $5 covers a lot of testing.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Get your API key</h3>
+      <p>Go to <strong>Settings → API Keys</strong> → Create new key. Copy it immediately — you only see it once.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Add it to .env</h3>
+      <p>In your project folder, copy the example file:</p>
+      <pre><code>cp .env.example .env</code></pre>
+      <p>Open <code>.env</code> and paste your key:</p>
+      <pre><code>COMFYUI_API_KEY=paste_your_key_here</code></pre>
+      <p>This file is gitignored — your key never leaves your machine.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h3>Test it</h3>
+      <p>Add a photo of yourself as <code>reference.jpg</code> in the project folder, then run:</p>
+      <pre><code>python3.11 generate-cover.py</code></pre>
+      <p>Output saves to <code>outputs/cover.png</code> and opens automatically.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The authentication error</strong>
+    <p>If you get <code>"authentication method not allowed"</code> — this is the most common first error. It means the API key isn't being passed in the request body. The scripts in this repo already handle this correctly via <code>extra_data</code>. Don't change that part.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 4 — SETUP: CLAUDE CODE
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">Setup — Part 3 of 3</div>
+  <div class="section-title">Claude</div>
+  <div class="section-italic">Code.</div>
+
+  <p>Claude Code is the AI coding assistant that wrote every script in this pipeline. You describe what you want in plain language. It writes the Python. You run it and give feedback.</p>
+  <p>You don't need to know how to code to use it. You need to know how to describe what you want.</p>
+
+  <div class="amber-divider"></div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Install Node.js</h3>
+      <p>Claude Code requires Node.js 18 or higher. Check if you have it:</p>
+      <pre><code>node --version</code></pre>
+      <p>If not, download from <code>nodejs.org</code> and install.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Install Claude Code</h3>
+      <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Get an Anthropic API key</h3>
+      <p>Go to <code>console.anthropic.com</code> → sign up → API Keys → create new. A typical scripting session costs cents.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Start Claude Code</h3>
+      <p>Navigate to your project folder, then run:</p>
+      <pre><code>cd your-project-folder
+claude</code></pre>
+      <p>It will prompt for your API key the first time. After that it opens instantly.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h3>Ask it to write a slide</h3>
+      <p>Try this as your first prompt:</p>
+      <pre><code>Add a make_03() function to generate-episode.py.
+Use make_illustrated() with:
+- Headline: "THREE MONTHS IN."
+- Emphasis: "still learning."
+- Body: "But building something real."</code></pre>
+      <p>It writes the code. You run the script. You give feedback. That's the loop.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>How I used it for this series</strong>
+    <p>I described each slide in plain language. Claude Code wrote the PIL function. I ran it, opened the output, gave feedback ("push the text lower", "make the headline bigger"), and it revised. No manual Python editing for 9 episodes.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 5 — GENERATING YOUR FIRST COVER
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">Using the pipeline</div>
+  <div class="section-title">Your first</div>
+  <div class="section-italic">cover image.</div>
+
+  <p>The cover is always generated first. It sets the visual identity for the whole episode — character, scene, mood.</p>
+
+  <div class="amber-divider"></div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Prepare your reference image</h3>
+      <p>Take a photo or use an existing illustration. Crop it to roughly square. Save as <code>reference.jpg</code> in your project folder.</p>
+      <p>This is what the model uses to match your face and character across every episode. Use the same reference image every time — never swap it mid-series.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Edit the prompt in generate-cover.py</h3>
+      <p>Open <code>generate-cover.py</code>. Find <code>POSITIVE_PROMPT</code> and update:</p>
+      <ul style="margin: 10px 0 10px 20px; color: #444; font-size: 14px; line-height: 2;">
+        <li>The hook word (top-left, small)</li>
+        <li>The scene elements (what floats around the character)</li>
+        <li>The character's emotion/action</li>
+        <li>Your series name (bottom text)</li>
+      </ul>
+      <p>See <code>docs/prompts.md</code> for the full prompt structure and tips.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Run and iterate on the seed</h3>
+      <p>Set <code>CONTROL_AFTER_GENERATE = "randomize"</code> and run 3–5 times:</p>
+      <pre><code>python3.11 generate-cover.py</code></pre>
+      <p>When you find an output where the character looks right, note the seed value that was used and lock it: <code>SEED = your_number</code>, <code>CONTROL_AFTER_GENERATE = "fixed"</code>.</p>
+      <p><strong>That seed is your character. Lock it and never change it.</strong></p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>It took 20+ iterations to lock the character in ep-07.</strong>
+    <p>Wrong face. Wrong hair. Wrong person every seed. The prompt structure in <code>docs/prompts.md</code> is the version that finally worked consistently. Start there.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 6 — CREATING SLIDES
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">Using the pipeline</div>
+  <div class="section-title">Creating</div>
+  <div class="section-italic">your slides.</div>
+
+  <p>Each episode gets its own script — a copy of <code>generate-episode.py</code> with the slide content filled in. The script opens every slide as it generates so you can review in real time.</p>
+
+  <div class="amber-divider"></div>
+
+  <p><strong>The three slide types:</strong></p>
+
+  <table>
+    <tr>
+      <th>Type</th>
+      <th>When to use</th>
+      <th>Function</th>
+    </tr>
+    <tr>
+      <td><strong>Illustrated</strong></td>
+      <td>You have a ComfyUI background. Text overlays the scene at the bottom.</td>
+      <td><code>make_illustrated()</code></td>
+    </tr>
+    <tr>
+      <td><strong>Dark text</strong></td>
+      <td>Statement or insight — no background image needed. Dark with amber bars.</td>
+      <td><code>make_dark()</code></td>
+    </tr>
+    <tr>
+      <td><strong>Cream CTA</strong></td>
+      <td>End of episode engagement question. Cream background, navy layout.</td>
+      <td><code>make_cta()</code></td>
+    </tr>
+    <tr>
+      <td><strong>Onboarding</strong></td>
+      <td>Always the last slide. "Most AI content shows you the result..."</td>
+      <td><code>make_onboarding()</code></td>
+    </tr>
+  </table>
+
+  <div class="amber-divider"></div>
+
+  <p><strong>The typography hierarchy — same on every slide:</strong></p>
+
+  <table>
+    <tr>
+      <th>Role</th>
+      <th>Font</th>
+      <th>Color</th>
+      <th>Size guide</th>
+    </tr>
+    <tr>
+      <td>Headline</td>
+      <td>Anton Regular</td>
+      <td>White <code>#F1F1F0</code></td>
+      <td>120–150px</td>
+    </tr>
+    <tr>
+      <td>Emphasis word</td>
+      <td>Playfair Display Bold Italic</td>
+      <td>Amber <code>#D97706</code></td>
+      <td>96–110px</td>
+    </tr>
+    <tr>
+      <td>Body text</td>
+      <td>Playfair Display Italic</td>
+      <td>Gray <code>#A0A0A0</code></td>
+      <td>32–44px</td>
+    </tr>
+    <tr>
+      <td>Footer</td>
+      <td>Playfair Display Italic</td>
+      <td>Gray</td>
+      <td>28px always</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <strong>Text position</strong>
+    <p>All illustrated slides use a fixed <code>start_y = 1650</code> — same vertical position on every slide regardless of how many lines of text. This is what gives the series visual consistency when scrolling through.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 7 — TIPS
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-label">From nine episodes of building this</div>
+  <div class="section-title">What I</div>
+  <div class="section-italic">learned.</div>
+
+  <div class="amber-divider"></div>
+
+  <div class="step">
+    <div class="step-num">—</div>
+    <div class="step-content">
+      <h3>Lock your character early</h3>
+      <p>Generate 5–10 covers with <code>"randomize"</code> seed before you commit to anything. The character drift is real — once you find a seed where it looks right, that seed is your series identity. Everything else can change. Not the seed.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">—</div>
+    <div class="step-content">
+      <h3>Use the same reference image every episode</h3>
+      <p>Never swap your reference image mid-series. It's the anchor for character consistency. Even a slightly different crop or brightness will cause drift.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">—</div>
+    <div class="step-content">
+      <h3>Read the whole error — not just the first line</h3>
+      <p>The most useful information is usually at the bottom of an error message. The <code>"authentication method not allowed"</code> issue took three hours because I kept reading the 200 status and missing the actual error in the response body.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">—</div>
+    <div class="step-content">
+      <h3>The WebSocket only broadcasts the filename once</h3>
+      <p>When a ComfyUI job completes, the output filename is broadcast exactly once via the <code>"executed"</code> event. If you miss it — the file is gone. The scripts in this repo capture it correctly. Don't restructure the WebSocket loop.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">—</div>
+    <div class="step-content">
+      <h3>Describe output to Claude Code — not code</h3>
+      <p>Don't say "write a PIL function that draws a rectangle at coordinates X". Say "I want a slide with a dark background, a big white headline in the top half, and an amber italic word below it." Claude Code handles the implementation.</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>An Architect Learning AI</span>
+    <span>@ayrus_ftw &nbsp;·&nbsp; instagram.com/ayrus_ftw</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 8 — BACK COVER
+══════════════════════════════════════════════════════════════ -->
+<div class="cover" style="page-break-after: auto;">
+  <div class="cover-top">An Architect Learning AI &nbsp;·&nbsp; @ayrus_ftw</div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">You've got the tools. Now build something.</div>
+    <div class="cover-headline">Start where<br>I ended up.</div>
+    <div class="cover-sub">Nine episodes. One pipeline.</div>
+    <div class="cover-desc" style="margin-top: 32px;">
+      Follow the series on Instagram for episode by episode documentation of what gets built next —
+      starting with the first real design brief.
+    </div>
+
+    <div style="margin-top: 48px; display: flex; gap: 16px; flex-wrap: wrap;">
+      <div style="background: var(--amber); color: var(--navy); font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 28px; border-radius: 6px;">
+        instagram.com/ayrus_ftw
+      </div>
+      <div style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); font-family: 'Inter', sans-serif; font-size: 14px; padding: 14px 28px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15);">
+        github.com/ayrus_ftw
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div style="font-family: 'Playfair Display', serif; font-style: italic; color: rgba(255,255,255,0.4); font-size: 14px;">
+      Free to share. Credit appreciated.
+    </div>
+    <div class="cover-tools">
+      ComfyUI Cloud &nbsp;·&nbsp; Python PIL &nbsp;·&nbsp; Claude Code
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
